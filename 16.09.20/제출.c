@@ -12,11 +12,13 @@ int main()
 	p->_mp_d[0] |= 1;
 	while (1)
 	{
-		if (mpz_probab_prime_p(p, 56)) 
+		if (mpz_probab_prime_p(p, 56))
 			break;
 		mpz_add_ui(p, p, 2);
 	}
 	gmp_printf("%Zd\n", p);
-	
+	mpz_clear(p);
+
+	getchar();
 	return 0;
 }
