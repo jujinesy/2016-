@@ -1,6 +1,20 @@
 #include "gmp.h"
 #include <stdlib.h>
 
+typedef struct _RSA_PRIKEY_ {
+	mpz_t n;
+	mpz_t e;
+}RSA_PUBKEY;
+
+typedef struct _RSA_PRIKEY_2 {
+	mpz_t n;
+	mpz_t e;
+	mpz_t p;
+	mpz_t q;
+	mpz_t d;
+};
+
+//void RSA_KEYGEN(RSA_PUBKEY * pubkey, RSA_PUBKEY *prikey )
 int main()
 {
 	mpz_t p, q, n, e, d, tmp;
@@ -87,7 +101,10 @@ int main()
 	mpz_invert(d, e, tmp);
 	gmp_printf("d = %Zx\n", d);
 	
-	
+	mpz_mul(e, e, d);
+	mpz_mod(tmp, e, tmp);
+	gmp_printf("e*d mod phi(n) = %Zx\n", tmp);
+
 	mpz_clear(p); mpz_clear(q); mpz_clear(n); mpz_clear(e); mpz_clear(d); mpz_clear(tmp);
 	gmp_randclear(state);
 
