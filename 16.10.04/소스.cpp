@@ -1,3 +1,4 @@
+//환경설정 PATH=$(SolutionDir)/include;%PATH%
 #include "../include/gmp.h"
 #include <stdlib.h>
 #include <time.h>
