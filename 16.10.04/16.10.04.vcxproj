@@ -145,9 +145,6 @@
     <ClCompile Include="소스.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\gmp.h" />
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="..\include\gmp.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

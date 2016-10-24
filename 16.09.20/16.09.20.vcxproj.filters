@@ -23,13 +23,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="gmp.lib">
+    <Library Include="..\include\gmp.lib">
       <Filter>리소스 파일</Filter>
     </Library>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="gmp.h">
-      <Filter>리소스 파일</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

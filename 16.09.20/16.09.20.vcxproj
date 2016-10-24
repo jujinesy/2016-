@@ -152,10 +152,7 @@
     <ClCompile Include="제출.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gmp.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="gmp.lib" />
+    <Library Include="..\include\gmp.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

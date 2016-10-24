@@ -152,10 +152,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="gmp.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="gmp.h" />
+    <Library Include="..\include\gmp.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

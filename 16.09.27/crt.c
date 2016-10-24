@@ -1,4 +1,4 @@
-#include "gmp.h"
+#include "../include/gmp.h"
 #include <stdlib.h>
 
 //1. 속도측정

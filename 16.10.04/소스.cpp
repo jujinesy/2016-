@@ -207,7 +207,7 @@ int keyGen(int RSAn,int RSAitr)
 
 int main()
 {
-	//keyGen(1024, 40);
+	keyGen(1024, 40);
 	keyGen(2048, 56);
 	keyGen(3096, 64);
 	keyGen(4096, 64);

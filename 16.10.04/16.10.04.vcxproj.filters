@@ -20,11 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\gmp.h">
-      <Filter>리소스 파일</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="..\include\gmp.lib">
       <Filter>리소스 파일</Filter>
     </Library>
