@@ -1,4 +1,5 @@
 //환경설정 PATH=$(SolutionDir)/include;%PATH%
+#pragma comment(lib, "../include/gmp.lib") 
 #include "../include/gmp.h"
 #include <stdlib.h>
 #include <time.h>
