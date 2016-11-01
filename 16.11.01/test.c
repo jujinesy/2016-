@@ -49,21 +49,22 @@ int main()
 	mpz_init(a); mpz_init(b); mpz_init(n);
 	gmp_randinit_default(state);
 
-	mpz_urandomb(a, state, 448);
+	mpz_urandomb(a, state, 440);
 	mpz_urandomb(n, state, 224);
-	mpz_set(b, a);
 
 	START_WATCH;
-	mpz_mod(a, a, n);
+	for(int i=0;i<10000;i++)
+		mpz_mod(b, a, n);
 	STOP_WATCH;
 	PRINT_TIME("mod ");
 	gmp_printf("a = %Zx\n", a);
 
 	START_WATCH;
-	GFP_fast_reduction_p224(b, b, n);
+	for (int i = 0; i<10000; i++)
+		GFP_fast_reduction_p224(b, a, n);
 	STOP_WATCH;
 	PRINT_TIME("GFP ");
-	gmp_printf("b = %Zx\n", b);
+	gmp_printf("a = %Zx\n", a);
 
 	mpz_clear(a); mpz_clear(n);
 	gmp_randclear(state);
