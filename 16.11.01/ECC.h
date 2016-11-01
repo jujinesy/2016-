@@ -26,8 +26,8 @@ float sec;
 
 
 // a mod n =r
-int GFP_fast_reduction_p224(mpz_t r, const mpz_t a, const mpz_t n);
-int GFP_fast_reduction_p256(mpz_t r, const mpz_t a, const mpz_t n);
+int GFP_fast_reduction_p224(mpz_t c, const mpz_t a, const mpz_t n);
+int GFP_fast_reduction_p256(mpz_t c, const mpz_t a, const mpz_t n);
 
 
 

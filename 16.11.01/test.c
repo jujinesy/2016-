@@ -43,30 +43,43 @@ void test_div_mul()
 int main()
 {
 	//test_div_mul();
-	mpz_t a, b, n;
+	mpz_t a, b, c, n;
 	gmp_randstate_t state;
 
-	mpz_init(a); mpz_init(b); mpz_init(n);
+	mpz_init(a); mpz_init(b); mpz_init(c); mpz_init(n);
 	gmp_randinit_default(state);
 
 	mpz_urandomb(a, state, 440);
 	mpz_urandomb(n, state, 224);
+	gmp_printf("a = %Zx\n", a);
+
+	n->_mp_d[6] = 0xffffffff;
+	n->_mp_d[5] = 0xffffffff;
+	n->_mp_d[4] = 0xffffffff;
+	n->_mp_d[3] = 0xffffffff;
+	n->_mp_d[2] = 0x0;
+	n->_mp_d[1] = 0x0;
+	n->_mp_d[0] = 0x1;
+	n->_mp_size = 7;
 
 	START_WATCH;
 	for(int i=0;i<10000;i++)
 		mpz_mod(b, a, n);
 	STOP_WATCH;
 	PRINT_TIME("mod ");
-	gmp_printf("a = %Zx\n", a);
+	gmp_printf("b = %Zx\n", b);
+
+
+
 
 	START_WATCH;
 	for (int i = 0; i<10000; i++)
-		GFP_fast_reduction_p224(b, a, n);
+		GFP_fast_reduction_p224(c, a, n);
 	STOP_WATCH;
 	PRINT_TIME("GFP ");
-	gmp_printf("a = %Zx\n", a);
+	gmp_printf("c = %Zx\n", c);
 
-	mpz_clear(a); mpz_clear(n);
+	mpz_clear(a); mpz_clear(b); mpz_clear(c); mpz_clear(n);
 	gmp_randclear(state);
 
 	return 0;

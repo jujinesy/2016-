@@ -3,7 +3,7 @@
 
 
 // a mod n =r
-int GFP_fast_reduction_p224(mpz_t r, const mpz_t a, const mpz_t n)
+int GFP_fast_reduction_p224(mpz_t c, const mpz_t a, const mpz_t n)
 {
 	//mpz_t s1;
 
@@ -17,8 +17,8 @@ int GFP_fast_reduction_p224(mpz_t r, const mpz_t a, const mpz_t n)
 	mpz_t s1, s2, s3, s4, s5;
 
 	if (mpz_size(a) > 14) {
-		mpz_mod(r, a, n);
-		//return -1;
+		mpz_mod(c, a, n);
+		return;
 	}
 
 	mpz_init2(s1, 500);
@@ -57,17 +57,16 @@ int GFP_fast_reduction_p224(mpz_t r, const mpz_t a, const mpz_t n)
 			mpz_sub(s2, s2, n);
 		}
 	}
-	else if (mpz_sgn(s2) < 0) {
-		while (mpz_sgn(s2) < 0) {
+	else if (mpz_sgn(s2)<0) {
+		while (mpz_sgn(s2)<0) {
 			mpz_add(s2, s2, n);
 		}
 	}
 
-	if (mpz_sgn(a) < 0) mpz_sub(r, n, s2);
-	else             mpz_set(r, s2);
+	if (mpz_sgn(a)<0) mpz_sub(c, n, s2);
+	else             mpz_set(c, s2);
 
 	mpz_clear(s1); mpz_clear(s2); mpz_clear(s3); mpz_clear(s4); mpz_clear(s5);
-
 	return 0;
 }
 
