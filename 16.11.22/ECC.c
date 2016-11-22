@@ -356,18 +356,18 @@ int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coeff
 				//GFP_affine_addition(&result, &result, p, );
 				GFP_affine_addtion(&tmp, &result, p, coefficient_a, prime);
 
-				mpz_set(result.x, tmp->x);
-				mpz_set(result.y, tmp->y);
-				tmp->point_at_infinity = result.point_at_infinity;
+				mpz_set(result->x, tmp->x);
+				mpz_set(result->y, tmp->y);
+				tmp->point_at_infinity = result->point_at_infinity;
 			}
 			else
 			{
 				//GFP_affine_addition(&result, &result, &r, );
 				GFP_affine_addtion(&tmp, &result, p, coefficient_a, prime);
 
-				mpz_set(result.x, tmp->x);
-				mpz_set(result.y, tmp->y);
-				tmp->point_at_infinity = result.point_at_infinity;
+				mpz_set(result->x, tmp->x);
+				mpz_set(result->y, tmp->y);
+				tmp->point_at_infinity = result->point_at_infinity;
 			}
 		}
 	}
