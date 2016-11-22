@@ -257,7 +257,7 @@ int GFP_LtoR_binary(GFP_POINT *r, mpz_t k, GFP_POINT *p, const mpz_t coefficient
 
 	GFP_point_init(&result); GFP_point_init(&tmp);
 
-	for (i = mpz_size(k) - 1; i <= 0 ; i--)
+	for (i = mpz_size(k) - 1; i <= 0; i--)
 	{
 		for (j = 31; j >= 0; j--)
 		{
@@ -271,7 +271,7 @@ int GFP_LtoR_binary(GFP_POINT *r, mpz_t k, GFP_POINT *p, const mpz_t coefficient
 
 			if (k->_mp_d[i] & (1 << j))
 			{
-				GFP_affine_addtion(&tmp, &result, p, coefficient_a, prime);
+				GFP_affine_addition(&tmp, &result, p, coefficient_a, prime);
 
 				mpz_set(result->x, tmp->x);
 				mpz_set(result->y, tmp->y);
@@ -291,7 +291,7 @@ int GFP_LtoR_binary(GFP_POINT *r, mpz_t k, GFP_POINT *p, const mpz_t coefficient
 
 	return 0;
 
-} 
+}
 
 
 int GFP_naf_recording(NAF_RECORDING *rk, mpz_t k) //3.30
@@ -338,9 +338,9 @@ int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coeff
 
 	if (k->naf_len > 1024)
 		return -1;
-	GFP_POINT_init(&result);
-	GFP_POINT_init(&neg_p);
-	GFP_POINT_init(&tmp);
+	GFP_point_init(&result);
+	GFP_point_init(&neg_p);
+	GFP_point_init(&tmp);
 	//GFP_POINT_set(&neg_p, p);
 	mpz_set(neg_p.x, p->x);
 	mpz_set(neg_p.y, p->y);
@@ -349,12 +349,16 @@ int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coeff
 	mpz_sub(neg_p.y, prime, neg_p.y);
 	for (i = k->naf_len - 1; i >= 0; i--) {
 		GFP_affine_doubling(&result, &result, coefficient_a, prime);
+
+		mpz_set(result.x, tmp->x);
+		mpz_set(result.y, tmp->y);
+		tmp->point_at_infinity = result.point_at_infinity;
 		if (k->naf_scalar[i] != 0)
 		{
 			if (k->naf_scalar[i] > 0)
 			{
 				//GFP_affine_addition(&result, &result, p, );
-				GFP_affine_addtion(&tmp, &result, p, coefficient_a, prime);
+				GFP_affine_addition(&tmp, &result, p, coefficient_a, prime);
 
 				mpz_set(result.x, tmp->x);
 				mpz_set(result.y, tmp->y);
@@ -363,7 +367,7 @@ int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coeff
 			else
 			{
 				//GFP_affine_addition(&result, &result, &r, );
-				GFP_affine_addtion(&tmp, &result, p, coefficient_a, prime);
+				GFP_affine_addition(&tmp, &result, p, coefficient_a, prime);
 
 				mpz_set(result.x, tmp->x);
 				mpz_set(result.y, tmp->y);
@@ -371,7 +375,12 @@ int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coeff
 			}
 		}
 	}
-	GFP_point_set(r, &result);
+	//GFP_point_set(r, &result);
+	mpz_set(r->x, result.x);
+	mpz_set(r->y, result.y);
+	result.point_at_infinity = r->point_at_infinity;
+
+
 	GFP_point_clear(&result);
 	return 0;
 }

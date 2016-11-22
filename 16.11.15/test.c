@@ -13,7 +13,7 @@ void test_div_mul()
 	//a »ý¼º
 	mpz_urandomb(a, state, 1024);
 	mpz_urandomb(b, state, 1024);
-	mpz_urandomb(d, state, 1024);
+	mpz_urandomb(d, state, 1024);;
 
 	START_WATCH;
 	for (int i = 0; i < 100000; i++) {

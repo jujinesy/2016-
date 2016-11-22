@@ -77,4 +77,6 @@ int GFP_LtoR_binary(GFP_POINT *r, mpz_t k, GFP_POINT *p, const mpz_t coefficient
 
 //R=kP LtoR NAF
 int GFP_naf_recording(NAF_RECORDING *rk, mpz_t k);
+
+
 int GFP_LtoR_binary(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coefficient_a, const mpz_t prime);
