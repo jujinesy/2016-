@@ -29,7 +29,7 @@ typedef struct _GFP_POINT_
 {
 	mpz_t x;
 	mpz_t y;
-	int point_at_infinity;
+	int point_at_infinity;//1nifi
 }GFP_POINT;
 
 typedef struct _NAF_RECORDING_
@@ -78,5 +78,5 @@ int GFP_LtoR_binary(GFP_POINT *r, mpz_t k, GFP_POINT *p, const mpz_t coefficient
 //R=kP LtoR NAF
 int GFP_naf_recording(NAF_RECORDING *rk, mpz_t k);
 
-
-int GFP_LtoR_binary(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coefficient_a, const mpz_t prime);
+// R=kP LtoR NAR
+int GFP_LtoR_NAR(GFP_POINT *r, NAF_RECORDING *k, GFP_POINT *p, const mpz_t coefficient_a, const mpz_t prime);
