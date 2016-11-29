@@ -14,9 +14,9 @@ typedef struct _ECC_HASH_ALGO{
 	void	(*hash)(const unsigned char *M, unsigned int len, unsigned char *Hash);
 	int  	digest_byte_len;
 	int 	block_byte_len;
-}RSA_HASH_ALGO;
+}ECC_HASH_ALGO;
 
-static const RSA_HASH_ALGO rsa_hash_algo[10]={
+static const ECC_HASH_ALGO ecc_hash_algo[10]={
 	{0,0,0},
 	{sha224,SHA224_DIGEST_SIZE,SHA224_BLOCK_SIZE},
 	{sha256,SHA256_DIGEST_SIZE,SHA256_BLOCK_SIZE},
@@ -86,3 +86,37 @@ int GFP_LtoR_binary(GFP_POINT *r,mpz_t k,GFP_POINT *p,const mpz_t coefficient_a,
 // R=kP LtoR NAF
 int GFP_naf_recording(NAF_RECORDING *rk, mpz_t k);
 int GFP_LtoR_NAF(GFP_POINT *r,NAF_RECORDING *k,GFP_POINT *p,const mpz_t coefficient_a,const mpz_t prime); 
+
+
+
+//ECDSA keypair gen
+int ECDSA_key_pair_gen(mpz_t prikey,//비밀키
+	GFP_POINT *pubkey, //공개키
+	GFP_POINT *p, //생성원
+	mpz_t order, //타원곡선 위수
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime);//유한체 소수
+
+int ECDSA_sign_gen(mpz_t r, //서명값 r
+	mpz_t s, //서명값 s
+	unsigned char *message, //메시지
+	int message_len, //메시지 길이
+	mpz_t prikey, //비밀키
+	mpz_t order, //타원곡선 위수
+	int hash_algo_info, //해시함수 정보
+	GFP_POINT *p, //생성원
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime);//유한체 소수
+
+int ECDSA_sign_ver(mpz_t r, //서명값 r
+	mpz_t s, //서명값 s
+	unsigned char *message, //메시지
+	int message_len, //메시지 길이
+	GFP_POINT *pubkey, //공개키
+	mpz_t order, //타원곡선 위수
+	int hash_algo_info, //해시함수 정보
+	GFP_POINT *p, //생성원
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime);//유한체 소수
+
+int ostr2mpz(mpz_t a, const unsigned char *ostr, const int ostrlen);

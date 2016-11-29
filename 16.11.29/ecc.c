@@ -1,4 +1,4 @@
-#include "ecc.h"
+﻿#include "ecc.h"
 
 
 
@@ -229,7 +229,7 @@ int GFP_affine_addition(GFP_POINT *r,GFP_POINT *p,GFP_POINT *q,const mpz_t coeff
 	}else{
 		mpz_init(tmp1); mpz_init(tmp2); mpz_init(tmp3);mpz_init(result);
 
-		//����
+		//기울기
 		mpz_sub_mod(tmp1,q->x,p->x,prime);
 		mpz_invert(tmp1,tmp1,prime);
 		mpz_sub(tmp2,q->y,p->y);
@@ -245,6 +245,8 @@ int GFP_affine_addition(GFP_POINT *r,GFP_POINT *p,GFP_POINT *q,const mpz_t coeff
 		mpz_mul_mod(tmp2,tmp1,tmp2,prime);
 		mpz_sub_mod(r->y,tmp2,p->y,prime);
 		mpz_set(r->x,result);
+
+		r->point_at_infinity = 0;
 
 		mpz_clear(tmp1); mpz_clear(tmp2); mpz_clear(tmp3);mpz_clear(result);
 	}
@@ -348,5 +350,218 @@ int GFP_LtoR_NAF(GFP_POINT *r,NAF_RECORDING *k,GFP_POINT *p,const mpz_t coeffici
 
 	GFP_point_clear(&result);
 
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+////16.11.29 추가
+//////////////////////////////////////////////////////////////////////
+
+int ECDSA_key_pair_gen(mpz_t prikey,//비밀키
+	GFP_POINT *pubkey, //공개키
+	GFP_POINT *p, //생성원
+	mpz_t order, //타원곡선 위수
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime)//유한체 소수
+{
+	gmp_randstate_t state;
+
+	gmp_randinit_default(state);
+
+	//비밀키 생성
+	mpz_urandomm(prikey, state, order);
+
+	//공개키 생성
+	GFP_LtoR_binary(pubkey, prikey, p, coefficient_a, prime);
+
+	gmp_randclear(state);
+
+	return 0;
+}
+
+int ECDSA_sign_gen(mpz_t r, //서명값 r 
+	mpz_t s, //서명값 s
+	unsigned char *message, //메시지
+	int message_len, //메시지 길이
+	mpz_t prikey, //비밀키
+	mpz_t order, //타원곡선 위수
+	int hash_algo_info, //해시함수 정보
+	GFP_POINT *p, //생성원
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime) //유한체 소수
+{
+	mpz_t rand, str, temp;
+	GFP_POINT kp;
+	gmp_randstate_t state;
+	unsigned char *hash_digest;
+
+	GFP_point_init(&kp);
+	mpz_init(rand);
+	mpz_init(str);
+	mpz_init(temp);
+	gmp_randinit_default(state);
+
+
+	//mpz_invert mpz_add
+	if ((hash_algo_info < 1) || (hash_algo_info > 4))
+		return -1;
+
+	/*
+	1. Select k ∈R [1,n−1].
+	2. Compute kP = (x1, y1) and convert x1 to an integer x1.
+	3. Compute r = x1 mod n. If r = 0 then go to step 1.
+	4. Compute e = H(m)
+	5. Compute s = k−1(e+dr) mod n. If s = 0 then go to step 1.
+	6. Return(r, s)
+	*/
+	while (1) {
+		while (1) {
+			mpz_init(rand);
+			gmp_randinit_default(state);
+			mpz_urandomm(rand, state, order);
+
+			GFP_LtoR_binary(&kp, rand, p, coefficient_a, prime);
+
+			mpz_mod(r, kp.x, order);
+			if (r->_mp_size)
+				break;
+		}
+		hash_digest = (unsigned char*)calloc(1, ecc_hash_algo[hash_algo_info].digest_byte_len);
+		ecc_hash_algo[hash_algo_info].hash(message, message_len, hash_digest);
+		ostr2mpz(str, hash_digest, ecc_hash_algo[hash_algo_info].digest_byte_len);
+
+		mpz_init(temp);
+		mpz_mul(temp, prikey, r);
+		mpz_add_mod(temp, temp, str, order);
+		mpz_invert(rand, rand, order);
+		mpz_mul_mod(s, rand, temp, order);
+		if (s->_mp_size)
+			break;
+	}
+	mpz_clear(rand);
+	mpz_clear(str);
+	mpz_clear(temp);
+	GFP_point_clear(&kp);
+	gmp_randclear(state);
+	free(hash_digest);
+	return 1;
+}
+
+int ECDSA_sign_ver(mpz_t r, //서명값 r 
+	mpz_t s, //서명값 s
+	unsigned char *message, //메시지
+	int message_len, //메시지 길이
+	mpz_t pubkey, //공개키
+	mpz_t order, //타원곡선 위수
+	int hash_algo_info, //해시함수 정보
+	GFP_POINT *p, //생성원
+	const mpz_t coefficient_a, //타원곡선계수
+	const mpz_t prime) //유한체 소수
+{
+	mpz_t ww, e, u1, u2;
+	GFP_POINT kp, t1, t2;
+	gmp_randstate_t state;
+	unsigned char *hash_digest;
+
+	if ((hash_algo_info < 1) || (hash_algo_info > 4))
+		return -1;
+
+	GFP_point_init(&kp);
+	GFP_point_init(&t1);
+	GFP_point_init(&t2);
+	mpz_init(ww);
+	mpz_init(e);
+	mpz_init(u1);
+	mpz_init(u2);
+	gmp_randinit_default(state);
+
+	//1.
+	if ((r->_mp_size == 0) || (s->_mp_size == 0))
+		return -1;
+	if (mpz_cmp(r, order) >= 0)
+		return -1;
+	if (mpz_cmp(s, order) >= 0)
+		return -1;
+	//2. compute e=H(m)
+	mpz_init(e);
+	hash_digest = (unsigned char*)calloc(1, ecc_hash_algo[hash_algo_info].digest_byte_len);
+	ecc_hash_algo[hash_algo_info].hash(message, message_len, hash_digest);
+	ostr2mpz(e, hash_digest, ecc_hash_algo[hash_algo_info].digest_byte_len);
+
+	//3. Compute w=
+	mpz_init(ww);
+	mpz_invert(ww, s, order);
+
+	//4.
+	mpz_mul_mod(u1, e, ww, order);
+	mpz_mul_mod(u2, r, ww, order);
+
+	//5.compute x=
+	GFP_point_init(&kp);
+	GFP_point_init(&t1);
+	GFP_point_init(&t2);
+	GFP_LtoR_binary(&t1, u1, p, coefficient_a, prime);
+	GFP_LtoR_binary(&t2, u2, pubkey, coefficient_a, prime);
+	GFP_affine_addition(&kp, &t1, &t2, coefficient_a, prime);
+
+	//6.
+	if (kp.point_at_infinity == 1) {
+		mpz_clear(ww);
+		mpz_clear(e);
+		mpz_clear(u1);
+		mpz_clear(u2);
+		GFP_point_clear(&kp);
+		GFP_point_clear(&t1);
+		GFP_point_clear(&t2);
+		gmp_randclear(state);
+		free(hash_digest);
+
+		return -2;
+	}
+	//8.
+	mpz_mod(e, kp.x, order);
+	if (mpz_cmp(e, r) == 0) {
+		mpz_clear(ww);
+		mpz_clear(e);
+		mpz_clear(u1);
+		mpz_clear(u2);
+		GFP_point_clear(&kp);
+		GFP_point_clear(&t1);
+		GFP_point_clear(&t2);
+		gmp_randclear(state);
+		free(hash_digest);
+		return 1;
+	}
+	else {
+		mpz_clear(ww);
+		mpz_clear(e);
+		mpz_clear(u1);
+		mpz_clear(u2);
+		GFP_point_clear(&kp);
+		GFP_point_clear(&t1);
+		GFP_point_clear(&t2);
+		gmp_randclear(state);
+		free(hash_digest);
+		return -2;
+	}
+}
+
+int ostr2mpz(mpz_t a, const unsigned char *ostr, const int ostrlen) {
+	int i, bytelen;
+	if (ostrlen == 0) { a->_mp_size = 0; return 0; }
+	if ((a == 0) || (ostr == 0)) return -1;  bytelen = ostrlen - 1; a->_mp_size = (ostrlen + 3) >> 2;
+	if (a->_mp_alloc < a->_mp_size) mpz_realloc2(a, (a->_mp_size << 5)); memset((unsigned int *)a->_mp_d, 0, (a->_mp_size << 2)); for (i = bytelen; i >= 0; i--) { a->_mp_d[(bytelen - i) >> 2] |= ((ostr[i]) << (((bytelen - i) & 0x3) << 3)); }
 	return 0;
 }
