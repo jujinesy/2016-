@@ -267,7 +267,9 @@ void test_ecdsa() {
 	mpz_set_str(order,"FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D",16);
 	
 	//base_p  
-	mpz_set_str(base_p.x,"b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",16); mpz_set_str(base_p.y,"bd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34",16); base_p.point_at_infinity=0;
+	mpz_set_str(base_p.x,"b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",16); 
+	mpz_set_str(base_p.y,"bd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34",16); 
+	base_p.point_at_infinity=0;
 
 	//ECDSA keypair gen 
 	ECDSA_key_pair_gen(prikey,&pubkey,&base_p,order,coefficient_a,prime);
